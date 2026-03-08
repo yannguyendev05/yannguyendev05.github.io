@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Facebook UA → Chrome Mobile</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f3f4f6;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: #166fe5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2>Convert Facebook UA → Chrome Mobile UA</h2>
+
+        <textarea id="inputUA" placeholder="Paste Facebook UA here"></textarea>
+
+        <button onclick="convertUA()">Convert</button>
+
+        <h3>Chrome Mobile UA</h3>
+
+        <textarea id="outputUA"></textarea>
+
+    </div>
+
+    <script>
+
+        function convertUA() {
+
+            let ua = document.getElementById("inputUA").value
+
+            // remove facebook tokens
+            ua = ua.replace(/\s*\[FB.*?\]/g, '')
+
+            // remove webview flag
+            ua = ua.replace('; wv', '')
+
+            // remove version webview
+            ua = ua.replace(/Version\/[\d\.]+\s*/g, '')
+
+            // detect android
+            if (ua.includes("Android")) {
+                let modelMatch = ua.match(/;\s([^;]+)\sBuild/)
+                let model = modelMatch ? modelMatch[1] : "Pixel 7"
+
+                ua = `Mozilla/5.0 (Linux; Android 13; ${model}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36`
+            }
+
+            // detect iphone
+            if (ua.includes("iPhone")) {
+                ua = "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36"
+            }
+
+            document.getElementById("outputUA").value = ua
+
+        }
+
+    </script>
+
+</body>
+
+</html>
