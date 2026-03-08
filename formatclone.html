@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Format UID | PASS | 2FA | COOKIE</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            cursor: pointer;
+            border: none;
+            background: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>INPUT</h2>
+    <textarea id="input" placeholder="Dán dữ liệu vào đây..."></textarea>
+
+    <button onclick="formatData()">FORMAT</button>
+    <button onclick="copyOutput()">COPY OUTPUT</button>
+
+    <h2>OUTPUT</h2>
+    <textarea id="output" placeholder="Kết quả sẽ hiển thị ở đây..."></textarea>
+
+    <script>
+        function formatData() {
+            const input = document.getElementById("input").value.trim();
+            const lines = input.split("\n");
+            let result = [];
+
+            lines.forEach(line => {
+                if (!line.trim()) return;
+
+                const parts = line.split("|").map(p => p.trim());
+
+                const uid = parts[0] || "";
+                const pass = parts[1] || "";
+
+                let twofa = "";
+                let cookie = "";
+
+                parts.forEach(part => {
+
+                    if (!part) return;
+
+                    // Detect 2FA secret (32 ký tự, không chứa = ;)
+                    if (part.length === 32 &&
+                        !part.includes("=") &&
+                        !part.includes(";")) {
+                        twofa = part;
+                    }
+
+                    // Detect cookie
+                    if (part.includes("c_user=")) {
+                        cookie = part;
+                    }
+                });
+
+                result.push(`${uid}|${pass}|${twofa}|${cookie}|full via`);
+            });
+
+            document.getElementById("output").value = result.join("\n");
+        }
+
+        function copyOutput() {
+            const output = document.getElementById("output");
+            output.select();
+            document.execCommand("copy");
+            alert("Đã copy!");
+        }
+    </script>
+
+</body>
+
+</html>
