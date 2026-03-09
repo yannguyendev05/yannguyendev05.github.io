@@ -2,13 +2,15 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Convert Facebook UA → Chrome Mobile</title>
+<title>Facebook UA → Chrome Mobile UA</title>
+
 <style>
 body{
 font-family:Arial;
 background:#f2f3f5;
 padding:40px;
 }
+
 .container{
 max-width:900px;
 margin:auto;
@@ -17,6 +19,7 @@ padding:25px;
 border-radius:10px;
 box-shadow:0 0 10px rgba(0,0,0,0.1);
 }
+
 textarea{
 width:100%;
 height:120px;
@@ -25,6 +28,7 @@ margin-top:10px;
 margin-bottom:15px;
 font-size:14px;
 }
+
 button{
 background:#1877f2;
 color:white;
@@ -34,6 +38,7 @@ border-radius:6px;
 cursor:pointer;
 font-size:15px;
 }
+
 button:hover{
 background:#166fe5;
 }
@@ -44,14 +49,14 @@ background:#166fe5;
 
 <div class="container">
 
-<h2>Convert Facebook UA → Chrome Mobile</h2>
+<h2>Convert Facebook UA → Chrome Mobile UA</h2>
 
-<label>Facebook UA</label>
+<label>Facebook Mobile UA</label>
 <textarea id="inputUA" placeholder="Paste UA Facebook Mobile"></textarea>
 
 <button onclick="convertUA()">Convert</button>
 
-<label>Chrome UA</label>
+<label>Chrome Mobile UA</label>
 <textarea id="outputUA"></textarea>
 
 </div>
@@ -60,7 +65,7 @@ background:#166fe5;
 
 function convertUA(){
 
-let ua = document.getElementById("inputUA").value
+let ua = document.getElementById("inputUA").value.trim()
 
 // remove facebook tokens
 ua = ua.replace(/\s*\[FB.*?\]/g,'')
@@ -74,19 +79,32 @@ ua = ua.replace(/Version\/[\d\.]+\s*/g,"")
 // ANDROID
 if(ua.includes("Android"))
 {
+
 let modelMatch = ua.match(/;\s([^;]+)\sBuild/)
 let model = modelMatch ? modelMatch[1] : "Pixel 7"
 
-ua = `Mozilla/5.0 (Linux; Android 13; ${model}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36`
+let androidMatch = ua.match(/Android\s([\d\.]+)/)
+let android = androidMatch ? androidMatch[1] : "13"
+
+let chromeMatch = ua.match(/Chrome\/([\d\.]+)/)
+let chrome = chromeMatch ? chromeMatch[1] : "142.0.0.0"
+
+ua = `Mozilla/5.0 (Linux; Android ${android}; ${model}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${chrome} Mobile Safari/537.36`
+
 }
 
 // IPHONE
 else if(ua.includes("iPhone"))
 {
+
 let osMatch = ua.match(/iPhone OS ([\d_]+)/)
 let os = osMatch ? osMatch[1] : "17_0"
 
-ua = `Mozilla/5.0 (iPhone; CPU iPhone OS ${os} like Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) CriOS/142.0.0.0 Mobile/15E148 Safari/604.1`
+let chromeMatch = ua.match(/CriOS\/([\d\.]+)/) || ua.match(/Chrome\/([\d\.]+)/)
+let chrome = chromeMatch ? chromeMatch[1] : "142.0.0.0"
+
+ua = `Mozilla/5.0 (iPhone; CPU iPhone OS ${os} like Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) CriOS/${chrome} Mobile/15E148 Safari/604.1`
+
 }
 
 document.getElementById("outputUA").value = ua.trim()
