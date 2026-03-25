@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Lọc trùng dữ liệu</title>
+<style>
+body { font-family: Arial; background:#111; color:#eee; padding:20px }
+textarea { width:100%; height:120px; margin-bottom:10px; background:#222; color:#fff; border:1px solid #444; padding:10px }
+button { padding:10px 20px; margin:10px 0; background:#0ea5e9; border:none; color:white; cursor:pointer }
+.output { margin-top:20px }
+.box { margin-bottom:15px }
+label { font-weight:bold }
+</style>
+</head>
+<body>
+
+<h2>Tool lọc trùng 2 danh sách</h2>
+
+<div class="box">
+<label>Input 1:</label>
+<textarea id="input1" placeholder="Mỗi dòng 1 giá trị"></textarea>
+</div>
+
+<div class="box">
+<label>Input 2:</label>
+<textarea id="input2" placeholder="Mỗi dòng 1 giá trị"></textarea>
+</div>
+
+<button onclick="processData()">Xử lý</button>
+
+<div class="output">
+<p id="stats"></p>
+
+<div class="box">
+<label>Trùng:</label>
+<textarea id="duplicate"></textarea>
+</div>
+
+<div class="box">
+<label>Unique Input 1:</label>
+<textarea id="unique1"></textarea>
+</div>
+
+<div class="box">
+<label>Unique Input 2:</label>
+<textarea id="unique2"></textarea>
+</div>
+
+<div class="box">
+<label>Gộp & lọc trùng:</label>
+<textarea id="merged"></textarea>
+</div>
+</div>
+
+<script>
+function normalize(input) {
+    return input.split(/\n|,|;/)
+        .map(x => x.trim())
+        .filter(x => x.length > 0);
+}
+
+function processData() {
+    let arr1 = normalize(document.getElementById("input1").value);
+    let arr2 = normalize(document.getElementById("input2").value);
+
+    let set1 = new Set(arr1);
+    let set2 = new Set(arr2);
+
+    let duplicate = [];
+    let unique1 = [];
+    let unique2 = [];
+
+    set1.forEach(item => {
+        if (set2.has(item)) duplicate.push(item);
+        else unique1.push(item);
+    });
+
+    set2.forEach(item => {
+        if (!set1.has(item)) unique2.push(item);
+    });
+
+    let merged = Array.from(new Set([...arr1, ...arr2]));
+
+    document.getElementById("duplicate").value = duplicate.join("\n");
+    document.getElementById("unique1").value = unique1.join("\n");
+    document.getElementById("unique2").value = unique2.join("\n");
+    document.getElementById("merged").value = merged.join("\n");
+
+    document.getElementById("stats").innerText =
+        `Trùng: ${duplicate.length} | Unique 1: ${unique1.length} | Unique 2: ${unique2.length} | Tổng unique sau gộp: ${merged.length}`;
+}
+</script>
+
+</body>
+</html>
