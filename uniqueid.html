@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Page ID Unique Filter</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        textarea {
+            width: 100%;
+            height: 220px;
+            resize: vertical;
+            font-family: Consolas;
+            font-size: 14px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        label {
+            margin-right: 20px;
+        }
+
+        .info {
+            margin: 15px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="box">
+
+        <h2>Input</h2>
+
+        <textarea id="input"
+            placeholder="Paste multiple blocks here...&#10;110216831742962|3040&#10;110486438585502|0&#10;..."></textarea>
+
+        <br><br>
+
+        <label>
+            <input type="radio" name="mode" value="id" checked>
+            Output Page ID
+        </label>
+
+        <label>
+            <input type="radio" name="mode" value="like">
+            Output Page ID | Like Count
+        </label>
+
+        <br><br>
+
+        <label>
+            <input type="radio" name="keep" value="first" checked>
+            Keep First Like Count
+        </label>
+
+        <label>
+            <input type="radio" name="keep" value="max">
+            Keep Max Like Count
+        </label>
+
+        <br><br>
+
+        <button onclick="processData()">Process</button>
+
+        <button onclick="copyResult()">Copy</button>
+
+        <div class="info" id="stats"></div>
+
+    </div>
+
+    <div class="box">
+
+        <h2>Output</h2>
+
+        <textarea id="output"></textarea>
+
+    </div>
+
+    <script>
+
+        function processData() {
+
+            let lines = document.getElementById("input").value
+                .split(/\r?\n/)
+                .map(x => x.trim())
+                .filter(x => x !== "");
+
+            let keepMode = document.querySelector("input[name=keep]:checked").value;
+            let outputMode = document.querySelector("input[name=mode]:checked").value;
+
+            let map = new Map();
+
+            let total = 0;
+            let duplicate = 0;
+
+            for (let line of lines) {
+
+                total++;
+
+                let parts = line.split("|");
+
+                let id = parts[0].trim();
+
+                let like = 0;
+
+                if (parts.length > 1)
+                    like = parseInt(parts[1]) || 0;
+
+                if (!map.has(id)) {
+
+                    map.set(id, like);
+
+                } else {
+
+                    duplicate++;
+
+                    if (keepMode === "max") {
+
+                        if (like > map.get(id))
+                            map.set(id, like);
+
+                    }
+
+                }
+
+            }
+
+            let result = [];
+
+            for (let [id, like] of map.entries()) {
+
+                if (outputMode === "id")
+                    result.push(id);
+                else
+                    result.push(id + "|" + like);
+
+            }
+
+            document.getElementById("output").value = result.join("\n");
+
+            document.getElementById("stats").innerHTML =
+                "Total: " + total +
+                " | Unique: " + map.size +
+                " | Duplicate: " + duplicate;
+
+        }
+
+        function copyResult() {
+
+            let txt = document.getElementById("output");
+
+            txt.select();
+
+            document.execCommand("copy");
+
+        }
+
+    </script>
+
+</body>
+
+</html>
